@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pattern Scanner — TechnoFunda Wiki</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1: #fcfcfb; --page: #f9f9f7;
+    --ink-1: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+    --grid: #e1e0d9; --baseline: #c3c2b7; --ring: rgba(11,11,11,0.10);
+    --good-text: #006300; --bad-text: #d03b3b;
+    --accent: #2a78d6; --badge-p1: #2a78d6; --badge-p3: #eb6834;
+    --badge-p5: #1baf7a; --badge-tag: #4a3aa7;
+    --st-good: #0ca30c; --st-warn: #b97e00; --st-serious: #b85c33; --st-crit: #d03b3b;
+    --candle-up: #008300; --candle-dn: #e34948;
+    --ema20: #2a78d6; --ema50: #eda100; --ema100: #1baf7a; --ema200: #4a3aa7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --surface-1: #1a1a19; --page: #0d0d0d;
+      --ink-1: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+      --grid: #2c2c2a; --baseline: #383835; --ring: rgba(255,255,255,0.10);
+      --good-text: #0ca30c; --bad-text: #e66767;
+      --accent: #3987e5; --badge-p1: #3987e5; --badge-p3: #d95926;
+      --badge-p5: #199e70; --badge-tag: #9085e9;
+      --st-good: #0ca30c; --st-warn: #fab219; --st-serious: #ec835a; --st-crit: #e66767;
+      --candle-up: #008300; --candle-dn: #e66767;
+      --ema20: #3987e5; --ema50: #c98500; --ema100: #199e70; --ema200: #9085e9;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-1: #1a1a19; --page: #0d0d0d;
+    --ink-1: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --baseline: #383835; --ring: rgba(255,255,255,0.10);
+    --good-text: #0ca30c; --bad-text: #e66767;
+    --accent: #3987e5; --badge-p1: #3987e5; --badge-p3: #d95926;
+    --badge-p5: #199e70; --badge-tag: #9085e9;
+    --st-good: #0ca30c; --st-warn: #fab219; --st-serious: #ec835a; --st-crit: #e66767;
+    --candle-up: #008300; --candle-dn: #e66767;
+    --ema20: #3987e5; --ema50: #c98500; --ema100: #199e70; --ema200: #9085e9;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--page); color: var(--ink-1);
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 24px clamp(12px, 3vw, 40px);
+  }
+  h1 { font-size: 20px; margin: 0 0 2px; }
+  .sub { color: var(--ink-2); font-size: 13px; margin-bottom: 18px; }
+  .tiles { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+  .tile {
+    background: var(--surface-1); border: 1px solid var(--ring); border-radius: 10px;
+    padding: 10px 16px; min-width: 112px;
+  }
+  .tile .v { font-size: 24px; font-weight: 650; }
+  .tile .l { color: var(--ink-2); font-size: 12px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
+  .flabel { color: var(--muted); font-size: 11.5px; text-transform: uppercase; letter-spacing: .04em;
+            align-self: center; margin-right: 2px; }
+  .chip {
+    border: 1px solid var(--baseline); background: var(--surface-1); color: var(--ink-1);
+    border-radius: 999px; padding: 5px 14px; font-size: 13px; cursor: pointer;
+  }
+  .chip.active { border-color: var(--accent); color: var(--accent); font-weight: 650; }
+  .tablewrap { overflow-x: auto; background: var(--surface-1); border: 1px solid var(--ring);
+               border-radius: 12px; margin-top: 10px; }
+  table { border-collapse: collapse; width: 100%; min-width: 1220px; }
+  th {
+    text-align: left; font-size: 11.5px; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--muted); font-weight: 600; padding: 10px 12px; border-bottom: 1px solid var(--grid);
+    white-space: nowrap;
+  }
+  th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td { padding: 9px 12px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+  tbody tr.mainrow { cursor: pointer; }
+  tbody tr.mainrow:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+  .stock a { color: var(--ink-1); text-decoration: none; font-weight: 650; }
+  .stock a:hover { color: var(--accent); }
+  .stock .tick { color: var(--muted); font-size: 12px; }
+  .caret { color: var(--muted); font-size: 11px; }
+  .badges { display: flex; flex-wrap: wrap; gap: 4px; max-width: 240px; }
+  .badge {
+    font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+    border: 1.5px solid; white-space: nowrap;
+  }
+  .b-p1 { color: var(--badge-p1); border-color: var(--badge-p1); }
+  .b-p3 { color: var(--badge-p3); border-color: var(--badge-p3); }
+  .b-p5 { color: var(--badge-p5); border-color: var(--badge-p5); }
+  .b-tag { color: var(--badge-tag); border-color: var(--badge-tag); }
+  .b-warn { color: var(--bad-text); border-color: var(--bad-text); }
+  .st { font-size: 11.5px; font-weight: 650; padding: 2px 9px; border-radius: 999px;
+        border: 1.5px solid; white-space: nowrap; display: inline-block; }
+  .st-entry-zone { color: var(--st-good); border-color: var(--st-good); }
+  .st-uptrend { color: var(--ink-2); border-color: var(--baseline); }
+  .st-extended { color: var(--st-warn); border-color: var(--st-warn); }
+  .st-exit-signal { color: var(--st-serious); border-color: var(--st-serious); }
+  .st-breakdown, .st-no-trend { color: var(--st-crit); border-color: var(--st-crit); }
+  .techmeta { color: var(--ink-2); font-size: 12px; margin-top: 4px; white-space: nowrap; }
+  .up { color: var(--good-text); font-weight: 600; }
+  .down { color: var(--bad-text); font-weight: 600; }
+  .dim { color: var(--muted); }
+  .note { color: var(--ink-2); font-size: 12px; max-width: 210px; }
+  .foot { color: var(--muted); font-size: 12px; margin-top: 14px; max-width: 980px; }
+  .theme-toggle { float: right; }
+  /* chart panel */
+  .chartrow td { background: color-mix(in srgb, var(--page) 55%, var(--surface-1)); padding: 14px 16px 18px; }
+  .chartbox { position: relative; max-width: 980px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--ink-2); margin-bottom: 6px; }
+  .legend .sw { display: inline-block; width: 14px; height: 3px; vertical-align: middle; margin-right: 5px; border-radius: 2px; }
+  .tooltip {
+    position: absolute; pointer-events: none; display: none; z-index: 5;
+    background: var(--surface-1); border: 1px solid var(--ring); border-radius: 8px;
+    padding: 7px 10px; font-size: 12px; line-height: 1.5; white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(0,0,0,.15); font-variant-numeric: tabular-nums;
+  }
+  svg text { font: 10.5px system-ui, sans-serif; fill: var(--muted); }
+  svg .crosshair { stroke: var(--baseline); stroke-dasharray: 3 3; }
+</style>
+</head>
+<body>
+<button class="chip theme-toggle" onclick="toggleTheme()">◐ theme</button>
+<a class="chip theme-toggle" style="margin-right:8px;text-decoration:none"
+   href="https://github.com/subbubrd/pattern-scanner/actions/workflows/scan.yml"
+   target="_blank" rel="noopener" title="Data refreshes automatically every weekday evening. Repo owner can trigger an immediate run here.">↻ refresh</a>
+<h1>Pattern Scanner</h1>
+<div class="sub" id="sub"></div>
+<div class="tiles" id="tiles"></div>
+<div class="filters" id="pfilters"></div>
+<div class="filters" id="tfilters"></div>
+<div class="tablewrap"><table>
+  <thead><tr>
+    <th>Stock</th><th>Signals &amp; tags</th><th>Technicals (weekly)</th>
+    <th class="num">TTM sales g</th><th class="num">TTM EBITDA g</th><th class="num">TTM PAT g</th>
+    <th class="num">OPM (TTM)</th><th class="num">OPM Δ3y</th>
+    <th class="num">Capex int.</th><th class="num">Debt Δ2y</th>
+    <th class="num">P/E</th><th class="num">ROCE</th>
+    <th>Note</th>
+  </tr></thead>
+  <tbody id="rows"></tbody>
+</table></div>
+<p class="foot">
+  Signals are research queues, not recommendations. <b>Patterns:</b> P1 = OPM up ≥3pts vs 3y, quarterly
+  trend intact · P3 <b>building</b> = capex ≥40% of 2-yr-ago gross block, margins not yet expanded ·
+  P3 <b>inflecting</b> = TTM EBITDA growing ≥1.4× sales · P5 = borrowings down ≥15% over 2y ·
+  ⚠ rev = reverse operating leverage. <b>Technicals</b> (weekly closes, EMA 20/50/100/200 as in the
+  TechnoFunda deck): <b>entry-zone</b> = uptrend, price near 20/50WEMA support · <b>uptrend</b> = hold,
+  add on pullback · <b>extended</b> = &gt;30% above 50WEMA, wait · <b>exit-signal</b> = weekly close below
+  50WEMA · <b>breakdown</b> = below 200WEMA · 🚀 = within 5% of 52w high. Click a row for the chart.
+  Data: Screener.in + Yahoo Finance. Rerun: <code>python fetch.py && python fetch_prices.py && python scan.py</code>.
+</p>
+<script>
+const DATA = /*__DATA__*/null;
+
+function toggleTheme() {
+  const r = document.documentElement;
+  const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+  const cur = r.dataset.theme || (dark ? "dark" : "light");
+  r.dataset.theme = cur === "dark" ? "light" : "dark";
+}
+
+const fmtPct = v => v === null || v === undefined ? '<span class="dim">–</span>'
+  : `<span class="${v >= 0 ? 'up' : 'down'}">${v >= 0 ? '▲' : '▼'} ${Math.abs(v).toFixed(1)}%</span>`;
+const fmtNum = (v, suf='') => v === null || v === undefined ? '<span class="dim">–</span>' : v + suf;
+const signed = v => v === null || v === undefined ? '–' : (v >= 0 ? '+' : '') + v + '%';
+
+let pfilter = "all", tfilter = "all", openTicker = null;
+const PFILTERS = [
+  ["all", "All"], ["p1", "P1 mix shift"], ["building", "P3 building"],
+  ["inflecting", "P3 inflecting"], ["p5", "P5 delever"], ["tagged", "P2/P4/P6 tagged"],
+  ["rev", "⚠ reverse leverage"],
+];
+const TFILTERS = [
+  ["all", "All"], ["entry-zone", "✓ entry zone"], ["uptrend", "uptrend"],
+  ["extended", "⏳ extended"], ["exit", "↓ exit/breakdown"], ["breakout", "🚀 breakout watch"],
+];
+const STATUS_LABEL = {
+  "entry-zone": "✓ entry zone", "uptrend": "uptrend — hold", "extended": "⏳ extended — wait",
+  "exit-signal": "↓ exit signal", "breakdown": "✕ breakdown", "no-trend": "✕ no trend",
+};
+
+function pmatch(r) {
+  switch (pfilter) {
+    case "p1": return r.p1_mix_shift;
+    case "building": return r.p3_capacity === "building";
+    case "inflecting": return r.p3_capacity === "inflecting";
+    case "p5": return r.p5_delever;
+    case "tagged": return r.tags && r.tags.length;
+    case "rev": return r.reverse_leverage;
+    default: return true;
+  }
+}
+function tmatch(r) {
+  const s = r.tech && r.tech.status;
+  switch (tfilter) {
+    case "entry-zone": case "uptrend": case "extended": return s === tfilter;
+    case "exit": return s === "exit-signal" || s === "breakdown" || s === "no-trend";
+    case "breakout": return r.tech && r.tech.breakout_watch;
+    default: return true;
+  }
+}
+
+function badges(r) {
+  const out = [];
+  if (r.p1_mix_shift) out.push('<span class="badge b-p1">P1 mix ✓</span>');
+  if (r.p3_capacity === "building") out.push('<span class="badge b-p3">P3 building</span>');
+  if (r.p3_capacity === "inflecting") out.push('<span class="badge b-p3">P3 inflecting ✓</span>');
+  if (r.p5_delever) out.push('<span class="badge b-p5">P5 delever ✓</span>');
+  if (r.reverse_leverage) out.push('<span class="badge b-warn">⚠ rev leverage</span>');
+  (r.tags || "").split(/[;|]/).map(t => t.trim()).filter(Boolean)
+    .forEach(t => out.push(`<span class="badge b-tag">${t}</span>`));
+  return `<div class="badges">${out.join("")}</div>`;
+}
+
+function techCell(r) {
+  const t = r.tech;
+  if (!t) return '<span class="dim">–</span>';
+  const lbl = STATUS_LABEL[t.status] || t.status;
+  const rocket = t.breakout_watch ? " 🚀" : "";
+  return `<span class="st st-${t.status}">${lbl}</span>${rocket}
+    <div class="techmeta">vs 50W ${signed(t.vs_e50)} · 52wH ${signed(t.from_52w_high)} · RSI ${t.rsi_w ?? "–"}</div>`;
+}
+
+function render() {
+  document.getElementById("sub").textContent =
+    `Scanned ${DATA.scanned} · ${DATA.results.length} stocks · Screener.in fundamentals + Yahoo weekly prices · click a row for its chart`;
+  const c = { p1:0, building:0, inflecting:0, p5:0, rev:0, entry:0, exit:0 };
+  DATA.results.forEach(r => {
+    if (r.p1_mix_shift) c.p1++;
+    if (r.p3_capacity === "building") c.building++;
+    if (r.p3_capacity === "inflecting") c.inflecting++;
+    if (r.p5_delever) c.p5++;
+    if (r.reverse_leverage) c.rev++;
+    const s = r.tech && r.tech.status;
+    if (s === "entry-zone") c.entry++;
+    if (s === "exit-signal" || s === "breakdown" || s === "no-trend") c.exit++;
+  });
+  document.getElementById("tiles").innerHTML = [
+    [c.p1, "P1 mix shift"], [c.building, "P3 building"], [c.inflecting, "P3 inflecting"],
+    [c.p5, "P5 delever"], [c.entry, "✓ entry zone"], [c.exit, "↓ exit/breakdown"], [c.rev, "⚠ reverse"],
+  ].map(([v, l]) => `<div class="tile"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+
+  document.getElementById("pfilters").innerHTML = '<span class="flabel">Pattern</span>' +
+    PFILTERS.map(([k, l]) =>
+      `<button class="chip ${pfilter === k ? 'active' : ''}" onclick="pfilter='${k}';render()">${l}</button>`).join("");
+  document.getElementById("tfilters").innerHTML = '<span class="flabel">Technical</span>' +
+    TFILTERS.map(([k, l]) =>
+      `<button class="chip ${tfilter === k ? 'active' : ''}" onclick="tfilter='${k}';render()">${l}</button>`).join("");
+
+  const rows = [];
+  DATA.results.filter(r => pmatch(r) && tmatch(r)).forEach(r => {
+    const open = openTicker === r.ticker;
+    rows.push(`<tr class="mainrow" onclick="toggleChart('${r.ticker}')">
+      <td class="stock"><span class="caret">${open ? "▼" : "▶"}</span>
+          <a href="${r.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${r.name}</a><br>
+          <span class="tick">${r.ticker} · ${r.price || ""}</span></td>
+      <td>${badges(r)}</td>
+      <td>${techCell(r)}</td>
+      <td class="num">${fmtPct(r.sales_g)}</td>
+      <td class="num">${fmtPct(r.ebitda_g)}</td>
+      <td class="num">${fmtPct(r.pat_g)}</td>
+      <td class="num">${fmtNum(r.opm_now, "%")}</td>
+      <td class="num">${r.opm_delta === null ? '<span class="dim">–</span>'
+          : `<span class="${r.opm_delta >= 0 ? 'up' : 'down'}">${r.opm_delta >= 0 ? '+' : ''}${r.opm_delta} pt</span>`}</td>
+      <td class="num">${fmtNum(r.capex_intensity)}</td>
+      <td class="num">${r.delever_pct === null ? '<span class="dim">–</span>'
+          : `<span class="${r.delever_pct >= 0 ? 'up' : 'down'}">${r.delever_pct >= 0 ? '−' : '+'}${Math.abs(r.delever_pct)}%</span>`}</td>
+      <td class="num">${fmtNum(r.pe)}</td>
+      <td class="num">${fmtNum(r.roce)}</td>
+      <td class="note">${r.note || ""}</td>
+    </tr>`);
+    if (open && r.tech) rows.push(`<tr class="chartrow"><td colspan="13">
+      <div class="legend">
+        <span><span class="sw" style="background:var(--ema20)"></span>20 WEMA</span>
+        <span><span class="sw" style="background:var(--ema50)"></span>50 WEMA</span>
+        <span><span class="sw" style="background:var(--ema100)"></span>100 WEMA</span>
+        <span><span class="sw" style="background:var(--ema200)"></span>200 WEMA</span>
+        <span><span class="sw" style="background:var(--baseline)"></span>52w high (dashed)</span>
+      </div>
+      <div class="chartbox" id="chart-${r.ticker}"></div>
+    </td></tr>`);
+  });
+  document.getElementById("rows").innerHTML = rows.join("");
+  if (openTicker) {
+    const r = DATA.results.find(x => x.ticker === openTicker);
+    if (r && r.tech) drawChart(document.getElementById(`chart-${r.ticker}`), r);
+  }
+}
+
+function toggleChart(t) {
+  openTicker = openTicker === t ? null : t;
+  render();
+}
+
+function drawChart(box, r) {
+  if (!box) return;
+  const ch = r.tech.chart, n = ch.c.length;
+  const W = 960, H = 320, padL = 8, padR = 58, padT = 10, padB = 24;
+  const iw = W - padL - padR, ih = H - padT - padB;
+  let lo = Math.min(...ch.l), hi = Math.max(...ch.h, ch.hi52);
+  const span = hi - lo || 1; lo -= span * 0.04; hi += span * 0.04;
+  const x = i => padL + (i + 0.5) / n * iw;
+  const y = v => padT + (1 - (v - lo) / (hi - lo)) * ih;
+  const bw = Math.max(1.5, iw / n * 0.62);
+
+  let s = "";
+  // horizontal grid + y labels
+  for (let g = 0; g <= 4; g++) {
+    const v = lo + (hi - lo) * g / 4, yy = y(v);
+    s += `<line x1="${padL}" y1="${yy}" x2="${W - padR}" y2="${yy}" stroke="var(--grid)" stroke-width="1"/>`;
+    s += `<text x="${W - padR + 6}" y="${yy + 3.5}">${Math.round(v).toLocaleString("en-IN")}</text>`;
+  }
+  // x labels ~6 ticks
+  const step = Math.ceil(n / 6);
+  for (let i = 0; i < n; i += step)
+    s += `<text x="${x(i)}" y="${H - 6}" text-anchor="middle">${ch.dates[i].slice(0, 7)}</text>`;
+  // 52w high dashed
+  s += `<line x1="${padL}" y1="${y(ch.hi52)}" x2="${W - padR}" y2="${y(ch.hi52)}" stroke="var(--baseline)" stroke-width="1" stroke-dasharray="4 4"/>`;
+  // candles
+  for (let i = 0; i < n; i++) {
+    const up = ch.c[i] >= ch.o[i], col = up ? "var(--candle-up)" : "var(--candle-dn)";
+    const yo = y(ch.o[i]), yc = y(ch.c[i]);
+    s += `<line x1="${x(i)}" y1="${y(ch.h[i])}" x2="${x(i)}" y2="${y(ch.l[i])}" stroke="${col}" stroke-width="1"/>`;
+    s += `<rect x="${x(i) - bw / 2}" y="${Math.min(yo, yc)}" width="${bw}" height="${Math.max(1.5, Math.abs(yo - yc))}" fill="${col}"/>`;
+  }
+  // EMA lines
+  const line = (arr, varname) =>
+    `<polyline fill="none" stroke="var(${varname})" stroke-width="2" points="${arr.map((v, i) => `${x(i)},${y(v)}`).join(" ")}"/>`;
+  s += line(ch.e200, "--ema200") + line(ch.e100, "--ema100") + line(ch.e50, "--ema50") + line(ch.e20, "--ema20");
+  s += `<line id="xh" class="crosshair" x1="0" y1="${padT}" x2="0" y2="${H - padB}" visibility="hidden"/>`;
+
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block">${s}</svg><div class="tooltip"></div>`;
+  const svg = box.querySelector("svg"), tip = box.querySelector(".tooltip"), xh = box.querySelector("#xh");
+  svg.addEventListener("mousemove", ev => {
+    const rect = svg.getBoundingClientRect();
+    const mx = (ev.clientX - rect.left) / rect.width * W;
+    const i = Math.max(0, Math.min(n - 1, Math.round((mx - padL) / iw * n - 0.5)));
+    xh.setAttribute("x1", x(i)); xh.setAttribute("x2", x(i)); xh.setAttribute("visibility", "visible");
+    tip.style.display = "block";
+    const left = ev.clientX - rect.left, flip = left > rect.width * 0.62;
+    tip.style.left = flip ? "" : (left + 14) + "px";
+    tip.style.right = flip ? (rect.width - left + 14) + "px" : "";
+    tip.style.top = (ev.clientY - rect.top + 12) + "px";
+    const f = v => Math.round(v).toLocaleString("en-IN");
+    tip.innerHTML = `<b>${ch.dates[i]}</b> (wk)<br>O ${f(ch.o[i])} · H ${f(ch.h[i])} · L ${f(ch.l[i])} · C <b>${f(ch.c[i])}</b><br>` +
+      `<span style="color:var(--ema20)">20W ${f(ch.e20[i])}</span> · <span style="color:var(--ema50)">50W ${f(ch.e50[i])}</span> · ` +
+      `<span style="color:var(--ema100)">100W ${f(ch.e100[i])}</span> · <span style="color:var(--ema200)">200W ${f(ch.e200[i])}</span>`;
+  });
+  svg.addEventListener("mouseleave", () => { tip.style.display = "none"; xh.setAttribute("visibility", "hidden"); });
+}
+render();
+</script>
+</body>
+</html>
