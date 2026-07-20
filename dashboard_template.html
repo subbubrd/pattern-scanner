@@ -12,7 +12,7 @@
     --grid: #e1e0d9; --baseline: #c3c2b7; --ring: rgba(11,11,11,0.10);
     --good-text: #006300; --bad-text: #d03b3b;
     --accent: #2a78d6; --badge-p1: #2a78d6; --badge-p3: #eb6834;
-    --badge-p5: #1baf7a; --badge-tag: #4a3aa7;
+    --badge-p5: #1baf7a; --badge-tag: #4a3aa7; --badge-pead: #b3177a;
     --st-good: #0ca30c; --st-warn: #b97e00; --st-serious: #b85c33; --st-crit: #d03b3b;
     --candle-up: #008300; --candle-dn: #e34948;
     --ema20: #2a78d6; --ema50: #eda100; --ema100: #1baf7a; --ema200: #4a3aa7;
@@ -25,7 +25,7 @@
       --grid: #2c2c2a; --baseline: #383835; --ring: rgba(255,255,255,0.10);
       --good-text: #0ca30c; --bad-text: #e66767;
       --accent: #3987e5; --badge-p1: #3987e5; --badge-p3: #d95926;
-      --badge-p5: #199e70; --badge-tag: #9085e9;
+      --badge-p5: #199e70; --badge-tag: #9085e9; --badge-pead: #e87ba4;
       --st-good: #0ca30c; --st-warn: #fab219; --st-serious: #ec835a; --st-crit: #e66767;
       --candle-up: #008300; --candle-dn: #e66767;
       --ema20: #3987e5; --ema50: #c98500; --ema100: #199e70; --ema200: #9085e9;
@@ -92,6 +92,9 @@
   .b-p5 { color: var(--badge-p5); border-color: var(--badge-p5); }
   .b-tag { color: var(--badge-tag); border-color: var(--badge-tag); }
   .b-warn { color: var(--bad-text); border-color: var(--bad-text); }
+  .b-pead { color: var(--badge-pead); border-color: var(--badge-pead); }
+  .b-pead-hot { color: var(--badge-pead); border-color: var(--badge-pead);
+    background: color-mix(in srgb, var(--badge-pead) 15%, transparent); font-weight: 700; }
   .st { font-size: 11.5px; font-weight: 650; padding: 2px 9px; border-radius: 999px;
         border: 1.5px solid; white-space: nowrap; display: inline-block; }
   .st-entry-zone { color: var(--st-good); border-color: var(--st-good); }
@@ -143,7 +146,10 @@
   <tbody id="rows"></tbody>
 </table></div>
 <p class="foot">
-  Signals are research queues, not recommendations. <b>Patterns:</b> P1 = OPM up ≥3pts vs 3y, quarterly
+  Signals are research queues, not recommendations. <b>PEAD</b> (post-earnings drift) = latest
+  quarter's YoY PAT ≥50% <i>and</i> operating profit ≥30% <i>and</i> sales ≥10%, at PE ≤70 and
+  mcap ≤₹1,00,000 Cr; 🚀 <b>confirmed</b> adds a weekly technical breakout near 52-week highs.
+  <b>Patterns:</b> P1 = OPM up ≥3pts vs 3y, quarterly
   trend intact · P3 <b>building</b> = capex ≥40% of 2-yr-ago gross block, margins not yet expanded ·
   P3 <b>inflecting</b> = TTM EBITDA growing ≥1.4× sales · P5 = borrowings down ≥15% over 2y ·
   ⚠ rev = reverse operating leverage. <b>Technicals</b> (weekly closes, EMA 20/50/100/200 as in the
@@ -169,7 +175,7 @@ const signed = v => v === null || v === undefined ? '–' : (v >= 0 ? '+' : '') 
 
 let pfilter = "all", tfilter = "all", openTicker = null;
 const PFILTERS = [
-  ["all", "All"], ["p1", "P1 mix shift"], ["building", "P3 building"],
+  ["all", "All"], ["pead", "PEAD surprise"], ["p1", "P1 mix shift"], ["building", "P3 building"],
   ["inflecting", "P3 inflecting"], ["p5", "P5 delever"], ["tagged", "P2/P4/P6 tagged"],
   ["rev", "⚠ reverse leverage"],
 ];
@@ -184,6 +190,7 @@ const STATUS_LABEL = {
 
 function pmatch(r) {
   switch (pfilter) {
+    case "pead": return r.pead;
     case "p1": return r.p1_mix_shift;
     case "building": return r.p3_capacity === "building";
     case "inflecting": return r.p3_capacity === "inflecting";
@@ -205,6 +212,13 @@ function tmatch(r) {
 
 function badges(r) {
   const out = [];
+  if (r.pead || r.pead_confirmed) {
+    const q = r.q_pat_yoy != null ? ` +${Math.round(r.q_pat_yoy)}%` : "";
+    const tt = `Latest-quarter YoY: PAT ${signed(r.q_pat_yoy)}, op.profit ${signed(r.q_op_yoy)}, sales ${signed(r.q_sales_yoy)}`;
+    out.push(r.pead_confirmed
+      ? `<span class="badge b-pead-hot" title="${tt} — breakout near 52w high">🚀 PEAD${q}</span>`
+      : `<span class="badge b-pead" title="${tt} — awaiting technical breakout">PEAD${q}</span>`);
+  }
   if (r.p1_mix_shift) out.push('<span class="badge b-p1">P1 mix ✓</span>');
   if (r.p3_capacity === "building") out.push('<span class="badge b-p3">P3 building</span>');
   if (r.p3_capacity === "inflecting") out.push('<span class="badge b-p3">P3 inflecting ✓</span>');
@@ -227,8 +241,10 @@ function techCell(r) {
 function render() {
   document.getElementById("sub").textContent =
     `Scanned ${DATA.scanned} · ${DATA.results.length} stocks · Screener.in fundamentals + Yahoo weekly prices · click a row for its chart`;
-  const c = { p1:0, building:0, inflecting:0, p5:0, rev:0, entry:0, exit:0 };
+  const c = { pead:0, peadHot:0, p1:0, building:0, inflecting:0, p5:0, rev:0, entry:0, exit:0 };
   DATA.results.forEach(r => {
+    if (r.pead) c.pead++;
+    if (r.pead_confirmed) c.peadHot++;
     if (r.p1_mix_shift) c.p1++;
     if (r.p3_capacity === "building") c.building++;
     if (r.p3_capacity === "inflecting") c.inflecting++;
@@ -239,6 +255,7 @@ function render() {
     if (s === "exit-signal" || s === "breakdown" || s === "no-trend") c.exit++;
   });
   document.getElementById("tiles").innerHTML = [
+    [c.pead, "PEAD surprise"], [c.peadHot, "🚀 PEAD confirmed"],
     [c.p1, "P1 mix shift"], [c.building, "P3 building"], [c.inflecting, "P3 inflecting"],
     [c.p5, "P5 delever"], [c.entry, "✓ entry zone"], [c.exit, "↓ exit/breakdown"], [c.rev, "⚠ reverse"],
   ].map(([v, l]) => `<div class="tile"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");

@@ -4,6 +4,9 @@ patterns from the TechnoFunda pattern library (see wiki/concepts/):
   P1 mix-shift   : OPM now vs 3y ago (>= +3pts) with quarterly margin trend intact
   P3 op-leverage : capacity-cycle phase from capex intensity + EBITDA-vs-sales growth gap
   P5 delever     : borrowings falling 2y running (>= 15%) with sales holding up
+  PEAD           : latest-quarter YoY earnings surprise (PAT & operating profit both
+                   explosive, top line growing) at a not-extreme PE and small/mid size;
+                   "confirmed" when the weekly technical layer shows a breakout near 52w highs
 
 P2 (proxy), P4 (regulatory), P6 (management) are qualitative — carried as tags
 from universe.csv and shown on the dashboard.
@@ -17,7 +20,7 @@ Outputs:
   dashboard.html               (self-contained, open in any browser)
   ../../wiki/analysis/scanner-latest.md
 """
-import csv, json
+import csv, json, re
 from datetime import date
 from pathlib import Path
 
@@ -31,6 +34,20 @@ MIN_OPM_DELTA = 3.0       # P1: percentage-point OPM improvement vs 3y ago
 CAPEX_INTENSITY_MIN = 0.40  # P3: (CWIP + 2y fixed-asset adds) / gross block 2y ago
 EBITDA_GROWTH_MULT = 1.4  # P3 inflection: EBITDA growing >= 1.4x sales
 DELEVER_MIN_PCT = 15.0    # P5: minimum 2y borrowing reduction
+# PEAD (latest single quarter, YoY vs the same quarter last year):
+PEAD_PAT_YOY = 50.0       # net-profit surprise floor
+PEAD_OP_YOY = 30.0        # operating-profit floor (beat isn't just other income / one-offs)
+PEAD_SALES_YOY = 10.0     # top line must be growing too
+PEAD_PE_MAX = 70.0        # "relatively low PE" — block only clearly rich valuations
+PEAD_MCAP_MAX = 100000.0  # Cr — PEAD favours small/mid; soft ceiling
+
+
+def num_from(s):
+    """First number out of a Screener ratio string, e.g. '₹ 82,647 Cr.' -> 82647.0."""
+    if not s:
+        return None
+    m = re.search(r"-?\d[\d,]*\.?\d*", s.replace(",", ""))
+    return float(m.group()) if m else None
 
 
 def last(vals, n=1, offset=0):
@@ -104,7 +121,19 @@ def scan_one(d, tags, note):
         sales_ok = sales_g is None or sales_g > -5
         p5 = b0 <= b1 <= b2 and delever_pct >= DELEVER_MIN_PCT and material and sales_ok
 
+    # --- PEAD: latest single quarter vs the same quarter a year ago ---
+    q_pat_yoy = growth(last(q.get("Net Profit")), last(q.get("Net Profit"), offset=4))
+    q_sales_yoy = growth(last(q.get("Sales")), last(q.get("Sales"), offset=4))
+    q_op_yoy = growth(last(q.get("Operating Profit")), last(q.get("Operating Profit"), offset=4))
     r = d.get("ratios", {})
+    pe_v, mcap_v = num_from(r.get("Stock P/E")), num_from(r.get("Market Cap"))
+    explosive = (q_pat_yoy is not None and q_pat_yoy >= PEAD_PAT_YOY
+                 and q_op_yoy is not None and q_op_yoy >= PEAD_OP_YOY
+                 and q_sales_yoy is not None and q_sales_yoy >= PEAD_SALES_YOY)
+    pe_ok = pe_v is None or pe_v <= PEAD_PE_MAX      # None PE = turnaround; don't block
+    size_ok = mcap_v is None or mcap_v <= PEAD_MCAP_MAX
+    pead = bool(explosive and pe_ok and size_ok)
+
     return {
         "ticker": d["ticker"], "name": "", "url": d["url"], "fetched": d["fetched"],
         "tags": tags, "note": note,
@@ -114,7 +143,9 @@ def scan_one(d, tags, note):
         "opm_now": opm_now, "opm_3y": opm_3y, "opm_delta": opm_delta,
         "capex_intensity": intensity, "delever_pct": delever_pct,
         "borrowings": [b2, b1, b0],
+        "q_pat_yoy": q_pat_yoy, "q_sales_yoy": q_sales_yoy, "q_op_yoy": q_op_yoy,
         "p1_mix_shift": p1, "p3_capacity": p3, "p5_delever": p5,
+        "pead": pead, "pead_confirmed": False,   # confirmed set in main() once tech is attached
         "reverse_leverage": reverse,
     }
 
@@ -132,11 +163,14 @@ def main():
         res["name"] = row.get("name", t).strip()
         pf = DATA / "prices" / f"{t}.json"
         res["tech"] = analyse(json.loads(pf.read_text(encoding="utf-8"))) if pf.exists() else None
+        # PEAD is "confirmed" when price is validating the surprise — breakout near 52w highs.
+        res["pead_confirmed"] = bool(res["pead"] and res["tech"] and res["tech"]["breakout_watch"])
         results.append(res)
 
-    # rank: number of quant signals, then EBITDA growth
+    # rank: number of quant signals (PEAD counts, +1 more if confirmed), then EBITDA growth
     def rank(r):
-        score = sum([r["p1_mix_shift"], r["p3_capacity"] is not None, r["p5_delever"]])
+        score = sum([r["p1_mix_shift"], r["p3_capacity"] is not None, r["p5_delever"],
+                     r["pead"], r["pead_confirmed"]])
         return (-score, -(r["ebitda_g"] or -999))
     results.sort(key=rank)
 
@@ -145,7 +179,8 @@ def main():
 
     write_dashboard(out)
     write_wiki_page(out)
-    n_hits = sum(1 for r in results if r["p1_mix_shift"] or r["p3_capacity"] or r["p5_delever"])
+    n_hits = sum(1 for r in results if r["p1_mix_shift"] or r["p3_capacity"]
+                 or r["p5_delever"] or r["pead"])
     print(f"scanned {len(results)} stocks, {n_hits} with at least one quant signal")
     print(f"dashboard: {BASE / 'dashboard.html'}")
 
@@ -181,9 +216,11 @@ def write_wiki_page(out):
         "manual tags. Thresholds: OPM +3pts vs 3y (P1); capex intensity ≥ 0.40 & flat margins "
         "= building, EBITDA growth ≥ 1.4× sales growth = inflecting (P3); borrowings −15% "
         "over 2y (P5). Do not treat a signal as a recommendation — it is a queue for research.", "",
+        "PEAD ([[pead]]): latest-quarter YoY PAT ≥ 50% & op-profit ≥ 30% & sales ≥ 10%, PE ≤ 70, "
+        "mcap ≤ ₹1,00,000 Cr. 🚀 = technically confirmed (breakout near 52w highs).", "",
         "Technical status (weekly): breakdown < 200WEMA · exit-signal < 50WEMA · extended "
         "> 1.3× 50WEMA · entry-zone = uptrend near 20/50WEMA support · 🚀 = within 5% of 52w high.", "",
-        "| Stock | P1 mix | P3 capacity | P5 delever | Tech status | vs 50WEMA | 52w high | TTM sales g | TTM EBITDA g | OPM Δ3y | Tags |",
+        "| Stock | PEAD (Q PAT YoY) | P1 mix | P3 capacity | P5 delever | Tech status | vs 50WEMA | 52w high | TTM EBITDA g | OPM Δ3y | Tags |",
         "|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for r in out["results"]:
@@ -192,12 +229,17 @@ def write_wiki_page(out):
         p3 = r["p3_capacity"] or ""
         p5 = "✅" if r["p5_delever"] else ""
         rev = " ⚠️rev" if r["reverse_leverage"] else ""
+        if r["pead_confirmed"]:
+            pead = f"🚀 +{r['q_pat_yoy']}%"
+        elif r["pead"]:
+            pead = f"✅ +{r['q_pat_yoy']}%"
+        else:
+            pead = ""
         t = r.get("tech") or {}
         tstat = (t.get("status") or "–") + (" 🚀" if t.get("breakout_watch") else "")
         lines.append(
-            f"| {wiki_link} {r['name']} | {p1} | {p3}{rev} | {p5} | {tstat} | "
+            f"| {wiki_link} {r['name']} | {pead} | {p1} | {p3}{rev} | {p5} | {tstat} | "
             f"{t.get('vs_e50', '–')}% | {t.get('from_52w_high', '–')}% | "
-            f"{r['sales_g'] if r['sales_g'] is not None else '–'}% | "
             f"{r['ebitda_g'] if r['ebitda_g'] is not None else '–'}% | "
             f"{r['opm_delta'] if r['opm_delta'] is not None else '–'} | {r['tags']} |")
     lines += ["", f"Full interactive dashboard: `tools/scanner/dashboard.html` "
