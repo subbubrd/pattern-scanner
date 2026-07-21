@@ -40,6 +40,10 @@ PEAD_OP_YOY = 30.0        # operating-profit floor (beat isn't just other income
 PEAD_SALES_YOY = 10.0     # top line must be growing too
 PEAD_PE_MAX = 70.0        # "relatively low PE" — block only clearly rich valuations
 PEAD_MCAP_MAX = 100000.0  # Cr — PEAD favours small/mid; soft ceiling
+# PEAD only counts stocks that have actually REPORTED this quarter (freshness gate).
+# Q1 FY27 = the Apr–Jun 2026 quarter, which Screener labels "Jun 2026".
+# Bump each results season: Sep 2026 (Q2 FY27), Dec 2026 (Q3 FY27), Mar 2027 (Q4 FY27).
+TARGET_QUARTER = "Jun 2026"
 
 
 def num_from(s):
@@ -48,6 +52,15 @@ def num_from(s):
         return None
     m = re.search(r"-?\d[\d,]*\.?\d*", s.replace(",", ""))
     return float(m.group()) if m else None
+
+
+def latest_quarter_label(cols, rows):
+    """Column label of the most recent quarter that actually has reported data."""
+    sales = (rows or {}).get("Sales") or []
+    for i in range(len(sales) - 1, -1, -1):
+        if sales[i] is not None:
+            return cols[i] if i < len(cols) else None
+    return None
 
 
 def last(vals, n=1, offset=0):
@@ -71,7 +84,9 @@ def growth(now, before):
 
 
 def scan_one(d, tags, note):
-    q = d["quarterly"]["rows"] if d.get("quarterly") else {}
+    qtbl = d.get("quarterly") or {}
+    q = qtbl.get("rows", {})
+    latest_q = latest_quarter_label(qtbl.get("columns", []), q)
     a = d["annual"]["rows"] if d.get("annual") else {}
     b = d["balance_sheet"]["rows"] if d.get("balance_sheet") else {}
 
@@ -132,7 +147,10 @@ def scan_one(d, tags, note):
                  and q_sales_yoy is not None and q_sales_yoy >= PEAD_SALES_YOY)
     pe_ok = pe_v is None or pe_v <= PEAD_PE_MAX      # None PE = turnaround; don't block
     size_ok = mcap_v is None or mcap_v <= PEAD_MCAP_MAX
-    pead = bool(explosive and pe_ok and size_ok)
+    # freshness: only stocks that have actually reported TARGET_QUARTER (Q1 FY27) qualify.
+    # Stocks yet to report still show their numbers, but never carry a PEAD flag.
+    fresh = (latest_q == TARGET_QUARTER)
+    pead = bool(explosive and pe_ok and size_ok and fresh)
 
     return {
         "ticker": d["ticker"], "name": "", "url": d["url"], "fetched": d["fetched"],
@@ -144,6 +162,7 @@ def scan_one(d, tags, note):
         "capex_intensity": intensity, "delever_pct": delever_pct,
         "borrowings": [b2, b1, b0],
         "q_pat_yoy": q_pat_yoy, "q_sales_yoy": q_sales_yoy, "q_op_yoy": q_op_yoy,
+        "latest_q": latest_q, "reported_target": fresh,
         "p1_mix_shift": p1, "p3_capacity": p3, "p5_delever": p5,
         "pead": pead, "pead_confirmed": False,   # confirmed set in main() once tech is attached
         "reverse_leverage": reverse,
@@ -174,7 +193,7 @@ def main():
         return (-score, -(r["ebitda_g"] or -999))
     results.sort(key=rank)
 
-    out = {"scanned": str(date.today()), "results": results}
+    out = {"scanned": str(date.today()), "target_quarter": TARGET_QUARTER, "results": results}
     (DATA / "scan_results.json").write_text(json.dumps(out, indent=1), encoding="utf-8")
 
     write_dashboard(out)
@@ -216,8 +235,9 @@ def write_wiki_page(out):
         "manual tags. Thresholds: OPM +3pts vs 3y (P1); capex intensity ≥ 0.40 & flat margins "
         "= building, EBITDA growth ≥ 1.4× sales growth = inflecting (P3); borrowings −15% "
         "over 2y (P5). Do not treat a signal as a recommendation — it is a queue for research.", "",
-        "PEAD ([[pead]]): latest-quarter YoY PAT ≥ 50% & op-profit ≥ 30% & sales ≥ 10%, PE ≤ 70, "
-        "mcap ≤ ₹1,00,000 Cr. 🚀 = technically confirmed (breakout near 52w highs).", "",
+        f"PEAD ([[pead]]): **only stocks that have reported Q1 FY27 ({TARGET_QUARTER})** — "
+        "YoY PAT ≥ 50% & op-profit ≥ 30% & sales ≥ 10%, PE ≤ 70, mcap ≤ ₹1,00,000 Cr. "
+        "🚀 = technically confirmed (breakout near 52w highs). Refreshed daily.", "",
         "Technical status (weekly): breakdown < 200WEMA · exit-signal < 50WEMA · extended "
         "> 1.3× 50WEMA · entry-zone = uptrend near 20/50WEMA support · 🚀 = within 5% of 52w high.", "",
         "| Stock | PEAD (Q PAT YoY) | P1 mix | P3 capacity | P5 delever | Tech status | vs 50WEMA | 52w high | TTM EBITDA g | OPM Δ3y | Tags |",
