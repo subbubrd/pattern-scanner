@@ -197,7 +197,8 @@ const esc = s => String(s || "").replace(/[&<>"']/g, c =>
 
 let pfilter = "all", tfilter = "all", openTicker = null;
 const PFILTERS = [
-  ["all", "All"], ["pead", "PEAD surprise"], ["p1", "P1 mix shift"], ["building", "P3 building"],
+  ["all", "All"], ["pead", "PEAD surprise"], ["fresh", "⚡ fresh discoveries"],
+  ["p1", "P1 mix shift"], ["building", "P3 building"],
   ["inflecting", "P3 inflecting"], ["p5", "P5 delever"], ["tagged", "P2/P4/P6 tagged"],
   ["rev", "⚠ reverse leverage"],
 ];
@@ -213,6 +214,7 @@ const STATUS_LABEL = {
 function pmatch(r) {
   switch (pfilter) {
     case "pead": return r.pead;
+    case "fresh": return r.source === "daily";
     case "p1": return r.p1_mix_shift;
     case "building": return r.p3_capacity === "building";
     case "inflecting": return r.p3_capacity === "inflecting";
@@ -234,6 +236,9 @@ function tmatch(r) {
 
 function badges(r) {
   const out = [];
+  if (r.source === "daily") out.push(
+    `<span class="badge" style="color:var(--badge-pead);border-color:var(--badge-pead)" `
+    + `title="Auto-discovered from the daily NSE results scan — not a curated universe name">⚡ fresh</span>`);
   if (r.pead || r.pead_confirmed) {
     const q = r.q_pat_yoy != null ? ` +${Math.round(r.q_pat_yoy)}%` : "";
     const tt = `${r.latest_q || "latest"} YoY: PAT ${signed(r.q_pat_yoy)}, op.profit ${signed(r.q_op_yoy)}, sales ${signed(r.q_sales_yoy)}`;
@@ -265,11 +270,11 @@ function techCell(r) {
 }
 
 function render() {
-  const reported = DATA.results.filter(r => r.reported_target).length;
+  const fresh = DATA.results.filter(r => r.source === "daily").length;
+  const universe = DATA.results.length - fresh;
   document.getElementById("sub").textContent =
-    `Scanned ${DATA.scanned} · ${DATA.results.length} stocks · PEAD counts only Q1 FY27 `
-    + `(${DATA.target_quarter}) results — ${reported}/${DATA.results.length} have reported `
-    + `· refreshed daily · click a row for its chart`;
+    `Scanned ${DATA.scanned} · ${universe} tracked + ${fresh} ⚡ fresh discoveries · `
+    + `PEAD = Q1 FY27 (${DATA.target_quarter}) surprises, refreshed daily · click a row for its chart`;
   const c = { pead:0, peadHot:0, p1:0, building:0, inflecting:0, p5:0, rev:0, entry:0, exit:0 };
   DATA.results.forEach(r => {
     if (r.pead) c.pead++;

@@ -25,6 +25,7 @@ from datetime import date
 from pathlib import Path
 
 from technicals import analyse
+import fetch_prices
 
 BASE = Path(__file__).parent
 DATA = BASE / "data"
@@ -169,6 +170,47 @@ def scan_one(d, tags, note):
     }
 
 
+def merge_daily_discoveries(results):
+    """Fold the fresh PEAD/growth hits from the event-driven daily scan
+    (data/daily_candidates.json, produced by daily_results.py) onto the dashboard
+    so newly-announced surprises appear without hand-editing universe.csv. These are
+    transient (they rotate as the season progresses), so they are NOT written to the
+    universe — only merged into the rendered results, tagged source='daily'."""
+    dc = DATA / "daily_candidates.json"
+    if not dc.exists():
+        return
+    try:
+        hits = json.loads(dc.read_text(encoding="utf-8")).get("hits", [])
+    except Exception:
+        return
+    known = {r["ticker"] for r in results}
+    added = 0
+    for h in hits:
+        t = h.get("ticker")
+        if not t or t in known:
+            continue
+        # daily_results.py already scored these with scan_one, so h carries all the
+        # signal fields; just fill in the render fields the dashboard needs.
+        h["name"] = h.get("_name", t)
+        h["source"] = "daily"
+        h["tags"] = f"daily-scan:{h.get('_tier','')}".rstrip(":")
+        h["note"] = f"Auto-discovered {h.get('_announced','')} · {h.get('_industry','')}".strip(" ·")
+        pf = DATA / "prices" / f"{t}.json"
+        if not pf.exists():
+            try:
+                p = fetch_prices.fetch_one(f"{t}.NS")
+                if p:
+                    pf.write_text(json.dumps(p), encoding="utf-8")
+            except Exception:
+                pass
+        h["tech"] = analyse(json.loads(pf.read_text(encoding="utf-8"))) if pf.exists() else None
+        h["pead_confirmed"] = bool(h.get("pead") and h["tech"] and h["tech"]["breakout_watch"])
+        results.append(h)
+        known.add(t)
+        added += 1
+    print(f"merged {added} fresh daily-scan discoveries onto the dashboard")
+
+
 def main():
     rows = list(csv.DictReader(open(BASE / "universe.csv", encoding="utf-8-sig")))
     results = []
@@ -184,7 +226,10 @@ def main():
         res["tech"] = analyse(json.loads(pf.read_text(encoding="utf-8"))) if pf.exists() else None
         # PEAD is "confirmed" when price is validating the surprise — breakout near 52w highs.
         res["pead_confirmed"] = bool(res["pead"] and res["tech"] and res["tech"]["breakout_watch"])
+        res["source"] = "universe"
         results.append(res)
+
+    merge_daily_discoveries(results)
 
     # rank: number of quant signals (PEAD counts, +1 more if confirmed), then EBITDA growth
     def rank(r):

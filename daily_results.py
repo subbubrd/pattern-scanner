@@ -37,16 +37,32 @@ def nse_session():
     return s
 
 
-def reporters(days=3):
+def reporters(days=3, attempts=4):
     """{symbol: {'name':..., 'date':...}} for companies whose board met on
-    financial results within the last `days` days."""
-    s = nse_session()
+    financial results within the last `days` days. Retries with a fresh primed
+    session — NSE intermittently rejects the first cookie-less hit, especially
+    from non-India IPs (e.g. CI runners)."""
     to_d = date.today()
     frm = to_d - timedelta(days=days)
     url = (f"{NSE}/api/corporate-board-meetings?index=equities"
            f"&from_date={frm.strftime('%d-%m-%Y')}&to_date={to_d.strftime('%d-%m-%Y')}")
-    j = s.get(url, timeout=30).json()
-    rows = j if isinstance(j, list) else j.get("data", [])
+    last_err = None
+    for i in range(attempts):
+        try:
+            s = nse_session()
+            r = s.get(url, timeout=30)
+            r.raise_for_status()
+            j = r.json()
+            rows = j if isinstance(j, list) else j.get("data", [])
+            if rows:
+                break
+            last_err = "empty response"
+        except Exception as e:
+            last_err = f"{type(e).__name__}: {e}"
+        print(f"  NSE attempt {i+1}/{attempts} failed ({last_err}); retrying...", file=sys.stderr)
+        time.sleep(3 * (i + 1))
+    else:
+        raise RuntimeError(f"NSE calendar unreachable after {attempts} attempts ({last_err})")
     out = {}
     for x in rows:
         blob = f"{x.get('bm_purpose','')} {x.get('bm_desc','')}".lower()
@@ -66,7 +82,7 @@ def main(days=3):
         rep = reporters(days)
     except Exception as e:
         print(f"NSE calendar unavailable ({type(e).__name__}: {e}) — aborting", file=sys.stderr)
-        return
+        sys.exit(1)   # fail visibly (workflow step is continue-on-error, so pipeline survives)
     print(f"NSE: {len(rep)} companies announced results in the last {days} days")
     today = str(date.today())
     hits, checked, failed = [], 0, 0
