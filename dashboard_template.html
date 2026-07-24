@@ -172,9 +172,9 @@
   trend intact · P3 <b>building</b> = capex ≥40% of 2-yr-ago gross block, margins not yet expanded ·
   P3 <b>inflecting</b> = TTM EBITDA growing ≥1.4× sales · P5 = borrowings down ≥15% over 2y ·
   ⚠ rev = reverse operating leverage. <b>Technicals</b> (weekly closes, EMA 20/50/100/200 as in the
-  TechnoFunda deck): <b>entry-zone</b> = uptrend, price near 20/50WEMA support · <b>uptrend</b> = hold,
-  add on pullback · <b>extended</b> = &gt;30% above 50WEMA, wait · <b>exit-signal</b> = weekly close below
-  50WEMA · <b>breakdown</b> = below 200WEMA · 🚀 = within 5% of 52w high. Click a row for the chart.
+  20W &amp; 40W moving averages): <b>entry-zone</b> = uptrend, price near 20WMA support · <b>uptrend</b> = hold,
+  add on pullback · <b>extended</b> = &gt;25% above 20WMA, wait · <b>exit-signal</b> = weekly close below
+  20WMA · <b>breakdown</b> = below 40WMA · 🚀 = within 5% of 52w high. Click a row for the chart.
   Data: Screener.in + Yahoo Finance. Rerun: <code>python fetch.py && python fetch_prices.py && python scan.py</code>.
 </p>
 <script>
@@ -266,7 +266,7 @@ function techCell(r) {
   const lbl = STATUS_LABEL[t.status] || t.status;
   const rocket = t.breakout_watch ? " 🚀" : "";
   return `<span class="st st-${t.status}">${lbl}</span>${rocket}
-    <div class="techmeta" title="Distance from 50-week EMA · from 52-week high · weekly RSI">50W ${rnd(t.vs_e50)} · 52wH ${rnd(t.from_52w_high)} · RSI ${t.rsi_w ? Math.round(t.rsi_w) : "–"}</div>`;
+    <div class="techmeta" title="Distance from 40-week MA · from 52-week high · weekly RSI">40W ${rnd(t.vs_e40)} · 52wH ${rnd(t.from_52w_high)} · RSI ${t.rsi_w ? Math.round(t.rsi_w) : "–"}</div>`;
 }
 
 function render() {
@@ -325,11 +325,11 @@ function render() {
     </tr>`);
     if (open && r.tech) rows.push(`<tr class="chartrow"><td colspan="12">
       <div class="legend">
-        <span><span class="sw" style="background:var(--ema20)"></span>20 WEMA</span>
-        <span><span class="sw" style="background:var(--ema50)"></span>50 WEMA</span>
-        <span><span class="sw" style="background:var(--ema100)"></span>100 WEMA</span>
-        <span><span class="sw" style="background:var(--ema200)"></span>200 WEMA</span>
-        <span><span class="sw" style="background:var(--baseline)"></span>52w high (dashed)</span>
+        <span><span class="sw" style="background:var(--ema20)"></span>20 WMA</span>
+        <span><span class="sw" style="background:var(--ema50)"></span>40 WMA</span>
+        <span><span class="sw" style="background:var(--st-crit)"></span>52w high (dashed)</span>
+        <span><span class="sw" style="background:var(--st-good)"></span>52w low (dashed)</span>
+        <span>◦ swing pivot (P)</span>
       </div>
       <div class="chartbox" id="chart-${r.ticker}"></div>
     </td></tr>`);
@@ -368,8 +368,13 @@ function drawChart(box, r) {
   const step = Math.ceil(n / 6);
   for (let i = 0; i < n; i += step)
     s += `<text x="${x(i)}" y="${H - 6}" text-anchor="middle">${ch.dates[i].slice(0, 7)}</text>`;
-  // 52w high dashed
-  s += `<line x1="${padL}" y1="${y(ch.hi52)}" x2="${W - padR}" y2="${y(ch.hi52)}" stroke="var(--baseline)" stroke-width="1" stroke-dasharray="4 4"/>`;
+  // 52-week high / low band (dashed, labelled at the right edge)
+  const band = (v, label, col) => {
+    const yy = y(v);
+    return `<line x1="${padL}" y1="${yy}" x2="${W - padR}" y2="${yy}" stroke="${col}" stroke-width="1" stroke-dasharray="4 4"/>`
+      + `<text x="${padL + 3}" y="${yy - 3}" style="fill:${col}">${label} ${Math.round(v).toLocaleString("en-IN")}</text>`;
+  };
+  s += band(ch.hi52, "52w H", "var(--st-crit)") + band(ch.lo52, "52w L", "var(--st-good)");
   // candles
   for (let i = 0; i < n; i++) {
     const up = ch.c[i] >= ch.o[i], col = up ? "var(--candle-up)" : "var(--candle-dn)";
@@ -377,10 +382,17 @@ function drawChart(box, r) {
     s += `<line x1="${x(i)}" y1="${y(ch.h[i])}" x2="${x(i)}" y2="${y(ch.l[i])}" stroke="${col}" stroke-width="1"/>`;
     s += `<rect x="${x(i) - bw / 2}" y="${Math.min(yo, yc)}" width="${bw}" height="${Math.max(1.5, Math.abs(yo - yc))}" fill="${col}"/>`;
   }
-  // EMA lines
+  // 20W / 40W moving averages
   const line = (arr, varname) =>
     `<polyline fill="none" stroke="var(${varname})" stroke-width="2" points="${arr.map((v, i) => `${x(i)},${y(v)}`).join(" ")}"/>`;
-  s += line(ch.e200, "--ema200") + line(ch.e100, "--ema100") + line(ch.e50, "--ema50") + line(ch.e20, "--ema20");
+  s += line(ch.e40, "--ema50") + line(ch.e20, "--ema20");
+  // swing pivots — hollow marker + small price tag; most recent of each gets a stronger dot
+  (ch.pivots || []).forEach((p, idx) => {
+    const isHigh = p.type === "high", col = isHigh ? "var(--st-crit)" : "var(--st-good)";
+    const py = y(p.price) + (isHigh ? -7 : 7), last = idx >= (ch.pivots.length - 2);
+    s += `<circle cx="${x(p.i)}" cy="${y(p.price)}" r="${last ? 3.5 : 2.5}" fill="var(--surface-1)" stroke="${col}" stroke-width="1.5"/>`;
+    if (last) s += `<text x="${x(p.i)}" y="${py}" text-anchor="middle" style="fill:${col};font-weight:600">P ${Math.round(p.price).toLocaleString("en-IN")}</text>`;
+  });
   s += `<line id="xh" class="crosshair" x1="0" y1="${padT}" x2="0" y2="${H - padB}" visibility="hidden"/>`;
 
   box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block">${s}</svg><div class="tooltip"></div>`;
@@ -397,8 +409,7 @@ function drawChart(box, r) {
     tip.style.top = (ev.clientY - rect.top + 12) + "px";
     const f = v => Math.round(v).toLocaleString("en-IN");
     tip.innerHTML = `<b>${ch.dates[i]}</b> (wk)<br>O ${f(ch.o[i])} · H ${f(ch.h[i])} · L ${f(ch.l[i])} · C <b>${f(ch.c[i])}</b><br>` +
-      `<span style="color:var(--ema20)">20W ${f(ch.e20[i])}</span> · <span style="color:var(--ema50)">50W ${f(ch.e50[i])}</span> · ` +
-      `<span style="color:var(--ema100)">100W ${f(ch.e100[i])}</span> · <span style="color:var(--ema200)">200W ${f(ch.e200[i])}</span>`;
+      `<span style="color:var(--ema20)">20W ${f(ch.e20[i])}</span> · <span style="color:var(--ema50)">40W ${f(ch.e40[i])}</span>`;
   });
   svg.addEventListener("mouseleave", () => { tip.style.display = "none"; xh.setAttribute("visibility", "hidden"); });
 }

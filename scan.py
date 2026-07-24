@@ -283,9 +283,9 @@ def write_wiki_page(out):
         f"PEAD ([[pead]]): **only stocks that have reported Q1 FY27 ({TARGET_QUARTER})** — "
         "YoY PAT ≥ 50% & op-profit ≥ 30% & sales ≥ 10%, PE ≤ 70, mcap ≤ ₹1,00,000 Cr. "
         "🚀 = technically confirmed (breakout near 52w highs). Refreshed daily.", "",
-        "Technical status (weekly): breakdown < 200WEMA · exit-signal < 50WEMA · extended "
-        "> 1.3× 50WEMA · entry-zone = uptrend near 20/50WEMA support · 🚀 = within 5% of 52w high.", "",
-        "| Stock | PEAD (Q PAT YoY) | P1 mix | P3 capacity | P5 delever | Tech status | vs 50WEMA | 52w high | TTM EBITDA g | OPM Δ3y | Tags |",
+        "Technical status (weekly, 20W & 40W MA): breakdown < 40WMA · exit-signal < 20WMA · "
+        "extended > 1.25× 20WMA · entry-zone = uptrend near 20WMA · 🚀 = within 5% of 52w high.", "",
+        "| Stock | PEAD (Q PAT YoY) | P1 mix | P3 capacity | P5 delever | Tech status | vs 40WMA | 52w high | TTM EBITDA g | OPM Δ3y | Tags |",
         "|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for r in out["results"]:
@@ -304,7 +304,7 @@ def write_wiki_page(out):
         tstat = (t.get("status") or "–") + (" 🚀" if t.get("breakout_watch") else "")
         lines.append(
             f"| {wiki_link} {r['name']} | {pead} | {p1} | {p3}{rev} | {p5} | {tstat} | "
-            f"{t.get('vs_e50', '–')}% | {t.get('from_52w_high', '–')}% | "
+            f"{t.get('vs_e40', '–')}% | {t.get('from_52w_high', '–')}% | "
             f"{r['ebitda_g'] if r['ebitda_g'] is not None else '–'}% | "
             f"{r['opm_delta'] if r['opm_delta'] is not None else '–'} | {r['tags']} |")
     lines += ["", f"Full interactive dashboard: `tools/scanner/dashboard.html` "
