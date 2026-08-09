@@ -1,34 +1,23 @@
-# Daily results scan — 2026-08-08
+# Daily results scan — 2026-08-09
 
-NSE announced-results calendar, last 3 days: **382** companies; 375 scored. Filter: market cap > ₹1000 Cr and actually reported **Jun 2026 (Q1 FY27)**. ★ = already tracked.
+NSE announced-results calendar, last 3 days: **294** companies; 288 scored. Filter: market cap > ₹1000 Cr and actually reported **Jun 2026 (Q1 FY27)**. ★ = already tracked.
 
-## PEAD — earnings surprise (43)
+## PEAD — earnings surprise (31)
 
 | Stock | Ticker | Announced | MCap | PE | PAT YoY | Op YoY | Sales YoY | Industry |
 |---|---|---|---|---|---|---|---|---|
-| Neuland Laboratories Limited | NEULANDLAB | 05-Aug-2026 | ₹ 29,323 Cr. | 58.9 | 957.1% | 555.9% | 119.1% | Pharmaceuticals |
 | BirlaNu Limited | BIRLANU | 06-Aug-2026 | ₹ 1,238 Cr. |  | 812.1% | 83.8% | 11.6% | - |
 | Arvind SmartSpaces Limited | ARVSMART | 07-Aug-2026 | ₹ 2,985 Cr. | 16.2 | 708.3% | 642.9% | 211.8% | - |
-| IG Petrochemicals Limited | IGPL | 05-Aug-2026 | ₹ 1,518 Cr. | 18.6 | 607.7% | 11300.0% | 31.5% | Petrochemicals |
-| Omnitech Engineering Limited | OMNI | 05-Aug-2026 | ₹ 7,152 Cr. | 68.8 | 500.0% | 88.9% | 62.1% | - |
 | Electronics Mart India Limited | EMIL | 07-Aug-2026 | ₹ 6,380 Cr. | 32.5 | 450.0% | 117.3% | 39.1% | - |
-| Savita Oil Technologies Limite | SOTL | 05-Aug-2026 | ₹ 5,186 Cr. | 12.5 | 414.3% | 506.7% | 49.6% | Lubricants |
-| Nahar Spinning Mills Limited | NAHARSPING | 05-Aug-2026 | ₹ 1,141 Cr. | 14.9 | 337.5% | 119.0% | 17.9% | Textiles - Synthetic |
+| IKIO Technologies Limited | IKIO | 08-Aug-2026 | ₹ 1,577 Cr. | 33.9 | 450.0% | 100.0% | 40.8% | - |
 | Gopal Snacks Limited | GOPAL | 07-Aug-2026 | ₹ 3,464 Cr. | 63.0 | 333.3% | 106.7% | 31.1% | - |
 | Rain Industries Limited | RAIN | 06-Aug-2026 | ₹ 7,497 Cr. | 14.0 | 310.8% | 53.3% | 17.4% | - |
-| Arisinfra Solutions Limited | ARIS | 05-Aug-2026 | ₹ 1,083 Cr. | 16.4 | 300.0% | 72.2% | 37.3% | - |
 | Atul Auto Limited | ATULAUTO | 08-Aug-2026 | ₹ 1,601 Cr. | 33.2 | 290.3% | 68.5% | 43.0% | - |
-| Gujarat Narmada Valley Fertili | GNFC | 05-Aug-2026 | ₹ 7,869 Cr. | 7.59 | 275.9% | 1167.7% | 39.8% | Fertilisers |
-| Allcargo Logistics Limited | ALLCARGO | 05-Aug-2026 | ₹ 1,387 Cr. | 30.2 | 255.6% | 39.2% | 11.2% | Travel And Transport |
 | Aegis Logistics Limited | AEGISLOG | 06-Aug-2026 | ₹ 48,122 Cr. | 38.5 | 211.4% | 197.5% | 37.1% | - |
-| Asahi India Glass Limited | ASAHIINDIA | 05-Aug-2026 | ₹ 22,910 Cr. | 51.3 | 170.9% | 69.3% | 15.0% | Auto Ancillaries |
 | IRM Energy Limited | IRMENERGY | 06-Aug-2026 | ₹ 1,208 Cr. | 16.5 | 142.9% | 138.5% | 24.4% | - |
 | LLOYDS ENGINEERING WORKS LIMIT | LLOYDSENGG | 06-Aug-2026 | ₹ 14,169 Cr. | 63.4 | 126.7% | 144.4% | 142.9% | - |
 | Goldiam International Limited | GOLDIAM | 07-Aug-2026 | ₹ 5,614 Cr. | 26.6 | 117.6% | 61.0% | 41.7% | Gems Jewellery And W |
-| Shilpa Medicare Limited | SHILPAMED | 05-Aug-2026 | ₹ 14,859 Cr. | 52.3 | 114.9% | 49.5% | 45.2% | Pharmaceuticals |
 | ★ S.J.S. Enterprises Limited | SJS | 06-Aug-2026 | ₹ 7,834 Cr. | 41.1 | 111.4% | 33.9% | 24.3% | - |
-| ★ Navin Fluorine International L | NAVINFLUOR | 05-Aug-2026 | ₹ 42,436 Cr. | 53.4 | 107.7% | 72.5% | 44.1% | Chemicals - Inorgani |
-| JTL INDUSTRIES LIMITED | JTLIND | 05-Aug-2026 | ₹ 2,954 Cr. | 25.8 | 105.9% | 156.5% | 32.7% | - |
 | Universal Cables Limited | UNIVCABLES | 07-Aug-2026 | ₹ 4,896 Cr. | 24.5 | 105.9% | 56.9% | 57.5% | Cables - Power |
 | Rategain Travel Technologies L | RATEGAIN | 06-Aug-2026 | ₹ 11,244 Cr. | 43.0 | 102.1% | 244.0% | 187.5% | - |
 | Oil India Limited | OIL | 07-Aug-2026 | ₹ 72,026 Cr. | 8.62 | 96.7% | 146.4% | 57.7% | Oil Exploration/Prod |
@@ -48,9 +37,8 @@ NSE announced-results calendar, last 3 days: **382** companies; 375 scored. Filt
 | Akums Drugs and Pharmaceutical | AKUMS | 08-Aug-2026 | ₹ 10,977 Cr. | 36.0 | 55.4% | 35.7% | 14.0% | - |
 | Premier Energies Limited | PREMIERENE | 06-Aug-2026 | ₹ 47,538 Cr. | 28.6 | 53.2% | 30.3% | 35.3% | - |
 | Aarti Pharmalabs Limited | AARTIPHARM | 07-Aug-2026 | ₹ 6,219 Cr. | 28.9 | 52.0% | 46.2% | 38.9% | - |
-| Pearl Global Industries Limite | PGIL | 05-Aug-2026 | ₹ 11,382 Cr. | 36.3 | 50.0% | 46.4% | 24.4% | Textile Products |
 
-## Strong grower (33)
+## Strong grower (28)
 
 | Stock | Ticker | Announced | MCap | PE | PAT YoY | Op YoY | Sales YoY | Industry |
 |---|---|---|---|---|---|---|---|---|
@@ -59,31 +47,26 @@ NSE announced-results calendar, last 3 days: **382** companies; 375 scored. Filt
 | Cupid Limited | CUPID | 07-Aug-2026 | ₹ 35,248 Cr. | 257 | 193.3% | 275.0% | 158.3% | - |
 | Igarashi Motors India Limited | IGARASHI | 06-Aug-2026 | ₹ 1,464 Cr. | 89.3 | 169.7% | 25.0% | 22.5% | Auto Ancillaries |
 | ★ Hitachi Energy India Limited | POWERINDIA | 07-Aug-2026 | ₹ 1,45,306 Cr. | 122 | 122.7% | 134.8% | 68.6% | - |
-| PB Fintech Limited | POLICYBZR | 05-Aug-2026 | ₹ 74,239 Cr. | 99.2 | 91.8% | 302.9% | 40.1% | - |
 | Ellenbarrie Industrial Gases L | ELLEN | 07-Aug-2026 | ₹ 4,120 Cr. | 34.2 | 84.2% | 22.6% | 17.9% | - |
 | Samvardhana Motherson Internat | MOTHERSON | 06-Aug-2026 | ₹ 1,77,842 Cr. | 38.9 | 77.6% | 26.0% | 16.7% | - |
 | Hindalco Industries Limited | HINDALCO | 07-Aug-2026 | ₹ 2,38,116 Cr. | 11.4 | 75.1% | 76.2% | 32.1% | Aluminium |
 | Siemens Energy India Limited | ENRIN | 06-Aug-2026 | ₹ 1,29,941 Cr. | 85.1 | 67.7% | 72.4% | 39.3% | - |
-| Mindspace Business Parks REIT | MINDSPACE | 05-Aug-2026 | ₹ 32,777 Cr. | 42.0 | 62.9% | 29.8% | 27.8% | - |
 | Titan Company Limited | TITAN | 07-Aug-2026 | ₹ 4,38,655 Cr. | 75.2 | 62.9% | 57.9% | 29.3% | Gems Jewellery And W |
-| Rane (Madras) Limited | RML | 05-Aug-2026 | ₹ 2,912 Cr. | 24.1 | 57.9% | 16.0% | 18.3% | Auto Ancillaries |
 | BEML Limited | BEML | 07-Aug-2026 | ₹ 14,890 Cr. | 83.4 | 57.8% | 104.1% | 29.3% | Engineering |
 | ★ Paras Defence and Space Techno | PARAS | 07-Aug-2026 | ₹ 10,292 Cr. | 111 | 50.0% | 45.5% | 37.6% | - |
 | G R Infraprojects Limited | GRINFRA | 06-Aug-2026 | ₹ 8,425 Cr. | 8.97 | 46.7% | 17.6% | 40.0% | - |
 | Shivalik Bimetal Controls Limi | SBCL | 06-Aug-2026 | ₹ 5,305 Cr. | 49.8 | 43.5% | 34.4% | 32.8% | - |
+| Lumax Industries Limited | LUMAXIND | 08-Aug-2026 | ₹ 5,415 Cr. | 26.9 | 41.7% | 34.1% | 32.5% | Auto Ancillaries |
 | ★ Apollo Micro Systems Limited | APOLLO | 08-Aug-2026 | ₹ 15,007 Cr. | 124 | 38.9% | 31.7% | 87.3% | - |
-| Mayur Uniquoters Ltd | MAYURUNIQ | 05-Aug-2026 | ₹ 3,359 Cr. | 16.2 | 36.6% | 37.2% | 24.5% | Textile Products |
 | Vijaya Diagnostic Centre Limit | VIJAYA | 06-Aug-2026 | ₹ 13,916 Cr. | 74.2 | 35.9% | 33.8% | 22.9% | - |
 | Emcure Pharmaceuticals Limited | EMCURE | 06-Aug-2026 | ₹ 37,526 Cr. | 36.4 | 35.8% | 27.6% | 22.8% | - |
 | Imagicaaworld Entertainment Li | IMAGICAA | 07-Aug-2026 | ₹ 2,950 Cr. | 232 | 31.8% | 23.3% | 20.3% | - |
 | Jeena Sikho Lifecare Limited | JSLL | 07-Aug-2026 | ₹ 7,434 Cr. | 31.4 | 29.4% | 16.5% | 28.7% | - |
 | Standard Engineering Technolog | SETL | 06-Aug-2026 | ₹ 5,606 Cr. | 65.5 | 28.6% | 33.3% | 43.4% | - |
 | Kewal Kiran Clothing Limited | KKCL | 06-Aug-2026 | ₹ 3,164 Cr. | 21.4 | 28.1% | 28.6% | 19.2% | Textile Products |
-| Inventurus Knowledge Solutions | IKS | 05-Aug-2026 | ₹ 29,830 Cr. | 39.1 | 27.6% | 21.8% | 20.8% | - |
 | CARE Ratings Limited | CARERATING | 07-Aug-2026 | ₹ 5,264 Cr. | 29.6 | 26.9% | 25.0% | 19.1% | Finance |
 | Mrs. Bectors Food Specialities | BECTORFOOD | 07-Aug-2026 | ₹ 6,889 Cr. | 46.3 | 25.8% | 24.1% | 16.1% | - |
 | COSMO FIRST LIMITED | COSMOFIRST | 06-Aug-2026 | ₹ 2,343 Cr. | 13.7 | 25.6% | 47.8% | 45.8% | - |
 | Ceigall India Limited | CEIGALL | 08-Aug-2026 | ₹ 5,807 Cr. | 18.1 | 25.5% | 31.2% | 15.8% | - |
 | Powerica Limited | POWERICA | 07-Aug-2026 | ₹ 6,748 Cr. | 24.0 | 25.5% | 24.7% | 26.6% | - |
 | Gala Precision Engineering Lim | GALAPREC | 06-Aug-2026 | ₹ 1,328 Cr. | 34.9 | 25.4% | 27.3% | 19.5% | - |
-| Aurobindo Pharma Limited | AUROPHARMA | 05-Aug-2026 | ₹ 96,297 Cr. | 25.5 | 25.2% | 17.3% | 16.3% | Pharmaceuticals |
