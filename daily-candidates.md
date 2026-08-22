@@ -1,6 +1,6 @@
-# Daily results scan — 2026-08-21
+# Daily results scan — 2026-08-22
 
-NSE announced-results calendar, last 3 days: **9** companies; 9 scored. Filter: market cap > ₹1000 Cr and actually reported **Jun 2026 (Q1 FY27)**. ★ = already tracked.
+NSE announced-results calendar, last 3 days: **7** companies; 7 scored. Filter: market cap > ₹1000 Cr and actually reported **Jun 2026 (Q1 FY27)**. ★ = already tracked.
 
 ## PEAD — earnings surprise (0)
 
@@ -11,4 +11,4 @@ NSE announced-results calendar, last 3 days: **9** companies; 9 scored. Filter: 
 
 | Stock | Ticker | Announced | MCap | PE | PAT YoY | Op YoY | Sales YoY | Industry |
 |---|---|---|---|---|---|---|---|---|
-| Innova Captab Limited | INNOVACAP | 21-Aug-2026 | ₹ 6,238 Cr. | 40.5 | 41.9% | 40.4% | 33.8% | - |
+| Innova Captab Limited | INNOVACAP | 21-Aug-2026 | ₹ 6,229 Cr. | 40.4 | 41.9% | 40.4% | 33.8% | - |
