@@ -1,4 +1,4 @@
-# Daily results scan — 2026-09-25
+# Daily results scan — 2026-09-26
 
 NSE announced-results calendar, last 3 days: **4** companies; 4 scored. Filter: market cap > ₹1000 Cr and actually reported **Jun 2026 (Q1 FY27)**. ★ = already tracked.
 
