@@ -1,27 +1,24 @@
-# Daily results scan — 2026-11-02
+# Daily results scan — 2026-11-03
 
-NSE announced-results calendar, last 3 days: **308** companies; 298 scored. Filter: market cap > ₹1000 Cr and actually reported **Jun 2026 (Q1 FY27)**. ★ = already tracked.
+NSE announced-results calendar, last 3 days: **366** companies; 353 scored. Filter: market cap > ₹1000 Cr and actually reported **Jun 2026 (Q1 FY27)**. ★ = already tracked.
 
-## PEAD — earnings surprise (10)
-
-| Stock | Ticker | Announced | MCap | PE | PAT YoY | Op YoY | Sales YoY | Industry |
-|---|---|---|---|---|---|---|---|---|
-| Sheela Foam Limited | SFL | 02-Nov-2026 | ₹ 6,006 Cr. | 29.5 | 785.7% | 45.3% | 25.7% | - |
-| Gopal Snacks Limited | GOPAL | 02-Nov-2026 | ₹ 3,134 Cr. | 57.0 | 333.3% | 106.7% | 31.1% | - |
-| Divgi Torqtransfer Systems Lim | DIVGIITTS | 02-Nov-2026 | ₹ 2,959 Cr. | 46.8 | 177.8% | 164.3% | 90.3% | - |
-| Puravankara Limited | PURVA | 02-Nov-2026 | ₹ 4,817 Cr. | 30.0 | 136.2% | 182.1% | 62.0% | Construction |
-| Tamilnadu PetroProducts Limite | TNPETRO | 02-Nov-2026 | ₹ 1,087 Cr. | 7.97 | 128.6% | 157.4% | 68.5% | Petrochemicals |
-| LLOYDS ENGINEERING WORKS LIMIT | LLOYDSENGG | 02-Nov-2026 | ₹ 13,151 Cr. | 58.8 | 126.7% | 144.4% | 142.9% | - |
-| Walchandnagar Industries Limit | WALCHANNAG | 02-Nov-2026 | ₹ 1,270 Cr. |  | 111.4% | 409.7% | 83.8% | Engineering |
-| Balaji Amines Limited | BALAMINES | 02-Nov-2026 | ₹ 5,868 Cr. | 28.7 | 110.8% | 110.9% | 27.4% | Chemicals - Inorgani |
-| National Aluminium Company Lim | NATIONALUM | 02-Nov-2026 | ₹ 60,242 Cr. | 8.92 | 90.9% | 83.2% | 39.3% | Aluminium |
-| Sun Pharma Advanced Research C | SPARC | 02-Nov-2026 | ₹ 5,682 Cr. | 3.56 | 59.6% | 34.6% | 300.0% | Pharmaceuticals |
-
-## Strong grower (4)
+## PEAD — earnings surprise (5)
 
 | Stock | Ticker | Announced | MCap | PE | PAT YoY | Op YoY | Sales YoY | Industry |
 |---|---|---|---|---|---|---|---|---|
-| Ideaforge Technology Limited | IDEAFORGE | 02-Nov-2026 | ₹ 3,179 Cr. | 809 | 89.0% | 112.2% | 436.7% | - |
-| EFC (I) Limited | EFCIL | 02-Nov-2026 | ₹ 2,601 Cr. | 10.1 | 51.1% | 20.6% | 28.6% | - |
-| Kewal Kiran Clothing Limited | KKCL | 02-Nov-2026 | ₹ 2,564 Cr. | 17.3 | 28.1% | 28.6% | 19.2% | Textile Products |
-| Choice International Limited | CHOICEIN | 02-Nov-2026 | ₹ 16,734 Cr. | 73.4 | 27.1% | 26.5% | 31.9% | - |
+| Kolte - Patil Developers Limit | KOLTEPATIL | 03-Nov-2026 | ₹ 3,941 Cr. | 31.7 | 964.7% | 826.9% | 1022.0% | Construction |
+| Allcargo Logistics Limited | ALLCARGO | 03-Nov-2026 | ₹ 1,457 Cr. | 31.7 | 255.6% | 39.2% | 11.2% | Travel And Transport |
+| Fractal Analytics Limited | FRACTAL | 03-Nov-2026 | ₹ 12,763 Cr. | 38.4 | 89.5% | 50.0% | 20.0% | - |
+| One Point One Solutions Limite | ONEPOINT | 03-Nov-2026 | ₹ 1,916 Cr. | 41.6 | 77.8% | 140.0% | 129.0% | - |
+| Servotech Renewable Power Syst | SERVOTECH | 03-Nov-2026 | ₹ 1,438 Cr. | 38.4 | 77.1% | 96.3% | 57.8% | - |
+
+## Strong grower (6)
+
+| Stock | Ticker | Announced | MCap | PE | PAT YoY | Op YoY | Sales YoY | Industry |
+|---|---|---|---|---|---|---|---|---|
+| Shukra Pharmaceuticals Limited | SHUKRAPHAR | 03-Nov-2026 | ₹ 3,530 Cr. | 104 | 1200.0% | 1800.0% | 380.0% | - |
+| Clean Max Enviro Energy Soluti | CLEANMAX | 03-Nov-2026 | ₹ 14,421 Cr. | 91.9 | 423.5% | 58.3% | 107.0% | - |
+| Lloyds Metals And Energy Limit | LLOYDSME | 03-Nov-2026 | ₹ 1,00,286 Cr. | 21.0 | 170.1% | 250.3% | 208.5% | - |
+| MPS Limited | MPSLTD | 03-Nov-2026 | ₹ 4,028 Cr. | 22.0 | 42.9% | 54.0% | 20.4% | Printing And Publish |
+| Vijaya Diagnostic Centre Limit | VIJAYA | 03-Nov-2026 | ₹ 14,901 Cr. | 79.5 | 35.9% | 33.8% | 22.9% | - |
+| Indiqube Spaces Limited | INDIQUBE | 03-Nov-2026 | ₹ 3,833 Cr. |  | 35.1% | 37.2% | 36.9% | - |
