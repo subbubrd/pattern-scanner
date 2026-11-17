@@ -1,6 +1,6 @@
-# Daily results scan — 2026-11-16
+# Daily results scan — 2026-11-17
 
-NSE announced-results calendar, last 3 days: **432** companies; 425 scored. Filter: market cap > ₹1000 Cr and actually reported **Jun 2026 (Q1 FY27)**. ★ = already tracked.
+NSE announced-results calendar, last 3 days: **191** companies; 188 scored. Filter: market cap > ₹1000 Cr and actually reported **Jun 2026 (Q1 FY27)**. ★ = already tracked.
 
 ## PEAD — earnings surprise (0)
 
